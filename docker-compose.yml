@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: migration_postgres
+    environment:
+      POSTGRES_USER: migration_user
+      POSTGRES_PASSWORD: migration_pass
+      POSTGRES_DB: target_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # seeds a second logical "legacy" DB + legacy table for demo purposes
+      - ./sample_data/legacy_orders_seed.sql:/docker-entrypoint-initdb.d/01_legacy_seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U migration_user -d target_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: migration_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TARGET_DB_URL: postgresql+psycopg2://migration_user:migration_pass@postgres:5432/target_db
+      LEGACY_DB_URL: postgresql+psycopg2://migration_user:migration_pass@postgres:5432/target_db
+      LOAD_BATCH_SIZE: 500
+    volumes:
+      - ./sample_data:/app/sample_data
+    command: ["python", "-m", "src.orchestration.cli", "run", "--customers-csv", "sample_data/customers_legacy.csv"]
+
+volumes:
+  pgdata:

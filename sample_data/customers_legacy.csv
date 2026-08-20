@@ -1,0 +1,8 @@
+customer_id,full_name,email,phone,addr_line,city,state,zip,signup_date
+C001,Jane Doe,Jane.Doe@Example.com,(555) 123-4567,123 Main St,Springfield,IL,62701,2023-01-15
+C002,John Smith,john.smith@example.com,555-234-5678,456 Oak Ave,Chicago,IL,60601,2023-02-20
+C003,Mary Jane Watson,mjwatson@example.com,,789 Pine Rd,Peoria,IL,61601,2023-03-10
+C004,Bad Email,not-an-email,555.345.6789,321 Elm St,Rockford,IL,61101,2023-04-05
+C005,,noNameHere@example.com,555-456-7890,654 Maple Dr,Aurora,IL,60502,2023-05-12
+C006,Duplicate One,dup@example.com,555-567-8901,111 First St,Naperville,IL,60540,2023-06-01
+C007,Duplicate Two,dup@example.com,555-678-9012,222 Second St,Naperville,IL,60540,2023-07-15
