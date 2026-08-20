@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Promo — Direct Call — Applied Success",
+    "notes": "Bound to _satellite.track('promo.applied_success', payload) in checkout.html. Maps to event6, eVar11.",
+    "events": [{ "modulePath": "core/src/lib/events/directCall.js", "settings": { "identifier": "promo.applied_success" } }],
+    "conditions": [],
+    "actions": [
+      {
+        "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+        "settings": {
+          "instanceName": "adobeAnalytics",
+          "trackerProperties": [
+            { "name": "eVar11", "value": "%DC: Payload > eVar11%" },
+            { "name": "events", "value": "event6" }
+          ]
+        }
+      },
+      { "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js", "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Promo Applied — Success" } }
+    ]
+  },
+  {
+    "name": "Promo — Direct Call — Applied Failure",
+    "notes": "Bound to _satellite.track('promo.applied_failure', payload). Maps to event7, eVar11 (captures the invalid code entered for troubleshooting/analysis).",
+    "events": [{ "modulePath": "core/src/lib/events/directCall.js", "settings": { "identifier": "promo.applied_failure" } }],
+    "conditions": [],
+    "actions": [
+      {
+        "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+        "settings": {
+          "instanceName": "adobeAnalytics",
+          "trackerProperties": [
+            { "name": "eVar11", "value": "%DC: Payload > eVar11%" },
+            { "name": "events", "value": "event7" }
+          ]
+        }
+      },
+      { "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js", "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Promo Applied — Failure" } }
+    ]
+  }
+]

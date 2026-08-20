@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Cart — Direct Call — Remove from Cart",
+    "notes": "Bound to _satellite.track('cart.remove', payload) in cart.html. Maps to event3.",
+    "events": [{ "modulePath": "core/src/lib/events/directCall.js", "settings": { "identifier": "cart.remove" } }],
+    "conditions": [],
+    "actions": [
+      {
+        "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+        "settings": {
+          "instanceName": "adobeAnalytics",
+          "trackerProperties": [
+            { "name": "eVar4", "value": "%DC: Payload > eVar4%" },
+            { "name": "eVar8", "value": "%DC: Payload > eVar8%" },
+            { "name": "events", "value": "event3" },
+            { "name": "products", "value": "%DC: Payload > products%" }
+          ]
+        }
+      },
+      { "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js", "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Remove from Cart" } }
+    ]
+  },
+  {
+    "name": "Checkout — Direct Call — Checkout Initiated",
+    "notes": "Bound to _satellite.track('checkout.initiated', payload) on the cart page's Checkout button. Maps to event4.",
+    "events": [{ "modulePath": "core/src/lib/events/directCall.js", "settings": { "identifier": "checkout.initiated" } }],
+    "conditions": [],
+    "actions": [
+      {
+        "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+        "settings": {
+          "instanceName": "adobeAnalytics",
+          "trackerProperties": [
+            { "name": "eVar8", "value": "%DC: Payload > eVar8%" },
+            { "name": "events", "value": "event4" }
+          ]
+        }
+      },
+      { "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js", "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Checkout Initiated" } }
+    ]
+  },
+  {
+    "name": "Checkout — Direct Call — Step Complete",
+    "notes": "Bound to _satellite.track('checkout.step_complete', payload) fired when the user advances a checkout step in checkout.html. Maps to event5, eVar9/prop9.",
+    "events": [{ "modulePath": "core/src/lib/events/directCall.js", "settings": { "identifier": "checkout.step_complete" } }],
+    "conditions": [],
+    "actions": [
+      {
+        "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+        "settings": {
+          "instanceName": "adobeAnalytics",
+          "trackerProperties": [
+            { "name": "eVar9", "value": "%DC: Payload > eVar9%" },
+            { "name": "prop9", "value": "%DC: Payload > prop9%" },
+            { "name": "events", "value": "event5" }
+          ]
+        }
+      },
+      { "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js", "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Checkout Step Complete" } }
+    ]
+  }
+]

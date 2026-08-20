@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.env
+node_modules/
+reporting/product_funnel_report.csv

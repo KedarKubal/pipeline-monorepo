@@ -1,0 +1,45 @@
+{
+  "name": "Library Loaded — All Pages — Page View Beacon",
+  "notes": "Fires an s.t() page-load beacon on every page. Reads data elements sourced from window.digitalData, which is populated by an inline script BEFORE the Launch embed runs. Maps directly to tracking-plan.md Section 6.",
+  "events": [
+    {
+      "modulePath": "core/src/lib/events/libraryLoaded.js",
+      "settings": { "bubbleFireIfParent": false, "bubbleFireIfChildFired": false }
+    }
+  ],
+  "conditions": [],
+  "actions": [
+    {
+      "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+      "settings": {
+        "instanceName": "adobeAnalytics",
+        "customSetup": { "enabled": false },
+        "linkType": null,
+        "trackerProperties": [
+          { "name": "eVar1", "value": "%Page Name%" },
+          { "name": "eVar2", "value": "%Page Section%" },
+          { "name": "eVar3", "value": "%Product Name%" },
+          { "name": "eVar4", "value": "%Product SKU%" },
+          { "name": "eVar5", "value": "%Product Category%" },
+          { "name": "eVar6", "value": "%Search Term%" },
+          { "name": "eVar7", "value": "%Search Results Count%" },
+          { "name": "eVar8", "value": "%Cart ID%" },
+          { "name": "eVar9", "value": "%Checkout Step Name%" },
+          { "name": "eVar10", "value": "%Order ID%" },
+          { "name": "eVar13", "value": "%Marketing Channel%" },
+          { "name": "eVar14", "value": "%Visitor Type%" },
+          { "name": "eVar15", "value": "%Page Error Code%" },
+          { "name": "prop1", "value": "%Page Name%" },
+          { "name": "prop2", "value": "%Page Section%" },
+          { "name": "prop3", "value": "%Product Name%" },
+          { "name": "prop9", "value": "%Checkout Step Name%" },
+          { "name": "events", "value": "%Computed Events String%" }
+        ]
+      }
+    },
+    {
+      "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js",
+      "settings": { "instanceName": "adobeAnalytics" }
+    }
+  ]
+}

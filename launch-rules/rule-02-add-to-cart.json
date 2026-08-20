@@ -1,0 +1,29 @@
+{
+  "name": "Cart — Direct Call — Add to Cart",
+  "notes": "Bound via _satellite.track('cart.add', payload) called from pdp.html's Add to Cart button handler. Maps to tracking-plan.md event2.",
+  "events": [
+    {
+      "modulePath": "core/src/lib/events/directCall.js",
+      "settings": { "identifier": "cart.add" }
+    }
+  ],
+  "conditions": [],
+  "actions": [
+    {
+      "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+      "settings": {
+        "instanceName": "adobeAnalytics",
+        "trackerProperties": [
+          { "name": "eVar4", "value": "%DC: Payload > eVar4%" },
+          { "name": "eVar8", "value": "%DC: Payload > eVar8%" },
+          { "name": "events", "value": "event2" },
+          { "name": "products", "value": "%DC: Payload > products%" }
+        ]
+      }
+    },
+    {
+      "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js",
+      "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Add to Cart" }
+    }
+  ]
+}

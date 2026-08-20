@@ -1,0 +1,52 @@
+{
+  "totalPages": 1,
+  "firstPage": true,
+  "lastPage": true,
+  "numberOfElements": 6,
+  "number": 0,
+  "totalElements": 6,
+  "columns": {
+    "dimension": {
+      "id": "variables/evar4",
+      "type": "string"
+    },
+    "columnIds": ["0", "1", "2"]
+  },
+  "rows": [
+    {
+      "itemId": "593912019",
+      "value": "NLG-JCK-1042",
+      "data": [1284, 212, 96]
+    },
+    {
+      "itemId": "593912020",
+      "value": "NLG-JCK-1077",
+      "data": [742, 88, 31]
+    },
+    {
+      "itemId": "593912021",
+      "value": "NLG-PCK-2011",
+      "data": [951, 140, 54]
+    },
+    {
+      "itemId": "593912022",
+      "value": "NLG-BTS-3005",
+      "data": [617, 71, 22]
+    },
+    {
+      "itemId": "593912023",
+      "value": "NLG-FLC-1090",
+      "data": [1103, 190, 77]
+    },
+    {
+      "itemId": "593912024",
+      "value": "NLG-BTL-4002",
+      "data": [389, 45, 19]
+    }
+  ],
+  "summaryData": {
+    "totals": [5086, 746, 299],
+    "col-max": [1284, 212, 96],
+    "col-min": [389, 45, 19]
+  }
+}

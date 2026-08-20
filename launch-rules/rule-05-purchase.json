@@ -1,0 +1,21 @@
+{
+  "name": "Order — Direct Call — Purchase",
+  "notes": "Bound to _satellite.track('order.purchase', payload) fired on confirmation.html load. Maps to event9 + standard purchase/revenue/units metrics via the products string, eVar10.",
+  "events": [{ "modulePath": "core/src/lib/events/directCall.js", "settings": { "identifier": "order.purchase" } }],
+  "conditions": [],
+  "actions": [
+    {
+      "modulePath": "adobe-analytics/src/lib/actions/setVariables.js",
+      "settings": {
+        "instanceName": "adobeAnalytics",
+        "trackerProperties": [
+          { "name": "eVar10", "value": "%DC: Payload > eVar10%" },
+          { "name": "purchaseID", "value": "%DC: Payload > eVar10%" },
+          { "name": "events", "value": "%DC: Payload > event9 as computed string%" },
+          { "name": "products", "value": "%DC: Payload > products%" }
+        ]
+      }
+    },
+    { "modulePath": "adobe-analytics/src/lib/actions/sendBeacon.js", "settings": { "instanceName": "adobeAnalytics", "linkType": "o", "linkName": "Order Purchase" } }
+  ]
+}

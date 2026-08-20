@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — Northline Goods</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="tight" style="padding-top:40px;">
+    <h1 style="font-size:28px;">Checkout</h1>
+    <div class="step-tracker" id="step-tracker"></div>
+
+    <div id="checkout-root"></div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/datalayer.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const items = window.NLG_cart.cartWithDetails();
+    if (!items.length) {
+      document.getElementById("checkout-root").innerHTML =
+        '<div class="empty-state"><h2>Your cart is empty</h2><p><a href="plp.html" class="btn secondary">Browse gear</a></p></div>';
+      document.getElementById("step-tracker").style.display = "none";
+    } else {
+      const steps = ["shipping", "payment", "review"];
+      let current = 0;
+      let appliedPromo = null;
+
+      function renderTracker() {
+        document.getElementById("step-tracker").innerHTML = steps
+          .map((s, i) => {
+            const cls = i < current ? "done" : i === current ? "active" : "";
+            return `<span class="step-pill ${cls}">${i + 1}. ${s}</span>`;
+          })
+          .join("");
+      }
+
+      function goToStep(index, opts) {
+        opts = opts || {};
+        current = index;
+        renderTracker();
+        document.querySelectorAll(".checkout-step").forEach((el, i) => el.classList.toggle("active", i === index));
+
+        // Virtual pageview per checkout step (SPA-style — same URL, new logical page)
+        window.digitalData.page.pageName = "Checkout: " + steps[index];
+        window.digitalData.checkout.stepName = steps[index];
+        window.AA.pageView();
+
+        if (opts.fireEvent4) {
+          window.AA.track("checkout.initiated_confirmed", { event4: 1, eVar8: window.digitalData.cart.id });
+        }
+        if (opts.fireEvent5) {
+          window.AA.track("checkout.step_complete", { event5: 1, eVar9: steps[index], prop9: steps[index] });
+        }
+      }
+
+      function subtotal() {
+        return items.reduce((s, i) => s + i.price * i.qty, 0);
+      }
+      function total() {
+        const discount = appliedPromo ? subtotal() * 0.1 : 0;
+        return Math.max(0, subtotal() + 12 - discount); // flat $12 shipping in this demo
+      }
+
+      document.getElementById("checkout-root").innerHTML = `
+        <div class="checkout-step" data-step="shipping">
+          <div class="form-row"><label for="name">Full name</label><input id="name" type="text" placeholder="Jordan Rivers" /></div>
+          <div class="form-row"><label for="address">Address</label><input id="address" type="text" placeholder="123 Trailhead Ave" /></div>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="city">City</label><input id="city" type="text" placeholder="Bend" /></div>
+            <div class="form-row"><label for="zip">ZIP</label><input id="zip" type="text" placeholder="97701" /></div>
+          </div>
+          <button class="btn" id="to-payment">Continue to Payment</button>
+        </div>
+
+        <div class="checkout-step" data-step="payment">
+          <div class="form-row"><label for="card">Card number</label><input id="card" type="text" placeholder="4111 1111 1111 1111" /></div>
+          <div class="form-grid-2">
+            <div class="form-row"><label for="exp">Expiry</label><input id="exp" type="text" placeholder="MM/YY" /></div>
+            <div class="form-row"><label for="cvc">CVC</label><input id="cvc" type="text" placeholder="123" /></div>
+          </div>
+          <div class="form-row">
+            <label for="promo">Promo code</label>
+            <div class="promo-row">
+              <input id="promo" type="text" placeholder="Try WELCOME10" />
+              <button class="btn secondary" id="apply-promo">Apply</button>
+            </div>
+            <div id="promo-msg" class="promo-msg"></div>
+          </div>
+          <button class="btn" id="to-review">Continue to Review</button>
+        </div>
+
+        <div class="checkout-step" data-step="review">
+          <div id="review-summary" style="margin-bottom:20px;"></div>
+          <button class="btn full" id="place-order">Place Order</button>
+        </div>`;
+
+      document.getElementById("to-payment").addEventListener("click", function () {
+        goToStep(1, { fireEvent5: true });
+      });
+
+      document.getElementById("apply-promo").addEventListener("click", function () {
+        const code = document.getElementById("promo").value.trim().toUpperCase();
+        const msg = document.getElementById("promo-msg");
+        if (code === "WELCOME10") {
+          appliedPromo = code;
+          msg.textContent = "WELCOME10 applied — 10% off.";
+          msg.className = "promo-msg success";
+          window.digitalData.promo.code = code;
+          window.AA.track("promo.applied_success", { event6: 1, eVar11: code });
+        } else {
+          msg.textContent = "That code isn't valid.";
+          msg.className = "promo-msg error";
+          window.AA.track("promo.applied_failure", { event7: 1, eVar11: code });
+        }
+      });
+
+      document.getElementById("to-review").addEventListener("click", function () {
+        document.getElementById("review-summary").innerHTML =
+          items.map((i) => `<div class="cart-summary-row"><span>${i.name} × ${i.qty}</span><span>$${(i.price * i.qty).toFixed(2)}</span></div>`).join("") +
+          `<div class="cart-summary-row"><span>Shipping</span><span>$12.00</span></div>` +
+          (appliedPromo ? `<div class="cart-summary-row"><span>Promo (${appliedPromo})</span><span>-$${(subtotal() * 0.1).toFixed(2)}</span></div>` : "") +
+          `<div class="cart-summary-row total"><span>Total</span><span>$${total().toFixed(2)}</span></div>`;
+        goToStep(2, { fireEvent5: true });
+      });
+
+      document.getElementById("place-order").addEventListener("click", function () {
+        const orderId = "NLG-" + Math.floor(100000 + Math.random() * 899999);
+        sessionStorage.setItem(
+          "nlg_last_order",
+          JSON.stringify({ orderId: orderId, items: items, total: total(), promo: appliedPromo })
+        );
+        localStorage.removeItem("nlg_cart_items");
+        window.location.href = "confirmation.html";
+      });
+
+      // Initial load = shipping step; event4 fires here too per tracking plan (belt-and-suspenders
+      // with the cart page's checkout-initiated event, in case checkout is entered directly)
+      goToStep(0, { fireEvent4: true, fireEvent5: true });
+    }
+  </script>
+</body>
+</html>

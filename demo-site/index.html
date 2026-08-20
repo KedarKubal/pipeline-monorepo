@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Northline Goods — Gear built for the shoulder seasons</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-section="Home">
+  <header class="site-header" id="site-header"></header>
+
+  <section class="hero">
+    <div class="eyebrow">Adobe Analytics tracking-plan demo</div>
+    <h1>Gear built for the miles between seasons.</h1>
+    <p>This storefront exists to exercise a real measurement implementation — a tracking plan, a data layer, Launch rules, and a reporting pull — not to sell jackets. Browse around; open the inspector at the bottom of the screen to watch every beacon fire.</p>
+    <p style="margin-top:28px;">
+      <a class="btn" href="plp.html?section=Outerwear">Shop Outerwear</a>
+      <a class="btn secondary" href="plp.html">View all gear</a>
+    </p>
+  </section>
+
+  <section>
+    <div class="eyebrow" style="margin-bottom:16px;">Featured</div>
+    <div class="product-grid" id="featured-grid"></div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/datalayer.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Page-load data layer for Home
+    window.digitalData.page.pageName = "Home";
+    window.digitalData.page.section = "Home";
+    window.AA.pageView();
+
+    // Featured products (first 3)
+    document.getElementById("featured-grid").innerHTML = window.NLG_PRODUCTS
+      .slice(0, 3)
+      .map(window.NLG_productCardHtml)
+      .join("");
+  </script>
+</body>
+</html>

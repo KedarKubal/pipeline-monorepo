@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop — Northline Goods</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="tight" style="padding-top:40px;">
+    <div class="eyebrow" id="plp-eyebrow">Shop</div>
+    <h1 id="plp-title" style="font-size:28px;">All Gear</h1>
+
+    <div class="toolbar">
+      <div class="results-count" id="results-count"></div>
+      <select id="sort-select" aria-label="Sort products">
+        <option value="relevance">Sort: Relevance</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+        <option value="name_asc">Name: A–Z</option>
+      </select>
+    </div>
+
+    <div class="product-grid" id="plp-grid"></div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/datalayer.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get("section");
+    const q = (params.get("q") || "").trim();
+
+    let results = window.NLG_PRODUCTS.slice();
+    if (section) results = results.filter((p) => p.section === section);
+    if (q) {
+      const needle = q.toLowerCase();
+      results = results.filter(
+        (p) => p.name.toLowerCase().includes(needle) || p.category.toLowerCase().includes(needle)
+      );
+    }
+
+    document.getElementById("plp-eyebrow").textContent = q ? "Search Results" : section || "Shop";
+    document.getElementById("plp-title").textContent = q ? `Results for "${q}"` : section ? section : "All Gear";
+    document.getElementById("results-count").textContent = `${results.length} item${results.length === 1 ? "" : "s"}`;
+
+    function renderGrid(list) {
+      document.getElementById("plp-grid").innerHTML =
+        list.map(window.NLG_productCardHtml).join("") ||
+        '<p style="color:var(--text-dim);">No products matched. Try a different search or category.</p>';
+    }
+    renderGrid(results);
+
+    document.getElementById("sort-select").addEventListener("change", function (e) {
+      const val = e.target.value;
+      let sorted = results.slice();
+      if (val === "price_asc") sorted.sort((a, b) => a.price - b.price);
+      else if (val === "price_desc") sorted.sort((a, b) => b.price - a.price);
+      else if (val === "name_asc") sorted.sort((a, b) => a.name.localeCompare(b.name));
+      renderGrid(sorted);
+
+      // Tracking plan: eVar12 / prop12 — active filter/sort selection, link-tracked (no new page view)
+      window.digitalData.plp = window.digitalData.plp || {};
+      window.digitalData.plp.activeFilter = "sort:" + val;
+      window.AA.track("plp.sort_applied", { eVar12: "sort:" + val, prop12: "sort:" + val });
+    });
+
+    // Page-load data layer for PLP / search results
+    window.digitalData.page.pageName = q ? "Search Results" : "PLP: " + (section || "All Gear");
+    window.digitalData.page.section = section || "All";
+    if (q) {
+      window.digitalData.search.term = q.toLowerCase();
+      window.digitalData.search.resultsCount = results.length;
+    }
+    window.AA.pageView();
+  </script>
+</body>
+</html>

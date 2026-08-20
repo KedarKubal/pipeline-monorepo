@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Order Confirmed — Northline Goods</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <section class="tight" style="padding-top:40px;">
+    <div id="confirm-root"></div>
+  </section>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="js/datalayer.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const raw = sessionStorage.getItem("nlg_last_order");
+    const root = document.getElementById("confirm-root");
+
+    if (!raw) {
+      root.innerHTML = '<div class="empty-state"><h2>No recent order found</h2><p><a href="plp.html" class="btn secondary">Browse gear</a></p></div>';
+    } else {
+      const order = JSON.parse(raw);
+      root.innerHTML = `
+        <div class="confirm-box">
+          <div class="eyebrow">Order Confirmed</div>
+          <h1>Thanks — it's on its way.</h1>
+          <div class="order-id">${order.orderId}</div>
+          <p style="color:var(--text-dim); max-width:420px; margin:0 auto 24px;">A confirmation email would go out here in a real store. This page is what fires the Purchase event and per-item revenue in the tracking plan.</p>
+          <a class="btn secondary" href="index.html">Back to Home</a>
+        </div>`;
+
+      // Page-load data layer for Order Confirmation
+      window.digitalData.page.pageName = "Order Confirmation";
+      window.digitalData.page.section = "Checkout";
+      window.digitalData.order = { orderId: order.orderId, items: order.items, total: order.total };
+      window.AA.pageView();
+
+      // Purchase: one products-string line item per SKU, each carrying event9 + purchase
+      const productsString = order.items
+        .map((i) => `${i.category};${i.name};${i.qty};${i.price.toFixed(2)};event9=${i.qty},purchase;eVar4=${i.sku}`)
+        .join(",");
+      window.AA.track("order.purchase", {
+        event9: order.items.reduce((s, i) => s + i.qty, 0),
+        eVar10: order.orderId,
+        purchase: order.total.toFixed(2),
+        products: productsString,
+      });
+    }
+  </script>
+</body>
+</html>
