@@ -1,0 +1,41 @@
+name: flutter_dsm
+repository: https://github.com/KedarKubal/flutter-dsm
+
+
+packages:
+  - packages/**
+
+command:
+  version:
+    linkToCommits: true
+  bootstrap:
+    runPubGetInParallel: true
+
+scripts:
+  analyze:
+    run: melos exec -- "dart analyze --fatal-infos"
+    description: Analyze all packages.
+
+  format:
+    run: melos exec -- "dart format --set-exit-if-changed ."
+    description: Check formatting across all packages.
+
+  test:
+    run: melos exec --dir-exists=test -- "flutter test"
+    description: Run tests in all packages that have a test/ directory.
+
+  test:golden:
+    run: melos exec --dir-exists=test/golden -- "flutter test --update-goldens test/golden"
+    description: Regenerate golden test images. Run after intentional visual changes.
+
+  test:golden:verify:
+    run: melos exec --dir-exists=test/golden -- "flutter test test/golden"
+    description: Verify golden tests without updating images (used in CI).
+
+  widgetbook:
+    run: cd packages/dsm_widgetbook && flutter run -d chrome
+    description: Launch the Widgetbook component gallery.
+
+  clean:deep:
+    run: melos exec -- "flutter clean"
+    description: Deep clean all packages.
