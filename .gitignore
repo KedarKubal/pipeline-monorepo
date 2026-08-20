@@ -3,3 +3,5 @@ __pycache__/
 .env
 node_modules/
 reporting/product_funnel_report.csv
+demo-site/test-results/
+demo-site/playwright-report/

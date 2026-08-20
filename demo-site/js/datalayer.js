@@ -171,6 +171,34 @@
     document.body.appendChild(toggle);
     document.body.appendChild(panel);
   }
+    // ---- 5. Feature flag client (calls the Config Toggle Service) ----------------
+  // Note: localhost:3000, not the docker-network hostname — this code runs in
+  // the browser, which only sees toggle-service's published host port.
+  const FLAG_SERVICE_URL = "http://localhost:3000";
+  const flagCache = {};
+
+  /**
+   * Fetches a flag's enabled state from the Config Toggle Service.
+   * Caches per page load (one request per key). Fails OPEN to `false` if
+   * the service is unreachable — a down toggle-service should never block
+   * a user action like adding to cart.
+   */
+  async function fetchFlag(key) {
+    if (key in flagCache) return flagCache[key];
+    try {
+      const res = await fetch(`${FLAG_SERVICE_URL}/api/flags/${encodeURIComponent(key)}`);
+      if (!res.ok) throw new Error(`Flag service returned ${res.status}`);
+      const data = await res.json();
+      flagCache[key] = !!data.enabled;
+    } catch (e) {
+      console.warn("[flags] toggle-service unreachable, defaulting to disabled:", e.message);
+      flagCache[key] = false;
+    }
+    return flagCache[key];
+  }
+  window.fetchFlag = fetchFlag;
+
+  window.AA = AA;
 
   window.AA = AA;
   document.addEventListener("DOMContentLoaded", function () {

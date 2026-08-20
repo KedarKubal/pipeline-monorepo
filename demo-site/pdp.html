@@ -48,18 +48,22 @@
           </div>
         </div>`;
 
-      document.getElementById("add-to-cart-btn").addEventListener("click", function () {
+      document.getElementById("add-to-cart-btn").addEventListener("click", async function () {
         const qty = Math.max(1, parseInt(document.getElementById("qty").value, 10) || 1);
         window.NLG_cart.addToCart(product.sku, qty);
 
-        // Tracking plan: event2 Add to Cart, products string convention
-        const productsString = `${product.category};${product.name};${qty};${product.price.toFixed(2)};event2=1;eVar4=${product.sku}`;
-        window.AA.track("cart.add", {
-          event2: qty,
-          eVar4: product.sku,
-          eVar8: window.digitalData.cart.id,
-          products: productsString,
-        });
+        // Gated behind cart-tracking-enabled — fixes the "no consent/CMP gating"
+        // known gap: cart data (event2) only fires if the flag allows it.
+        const cartTrackingEnabled = await window.fetchFlag("cart-tracking-enabled");
+        if (cartTrackingEnabled) {
+          const productsString = `${product.category};${product.name};${qty};${product.price.toFixed(2)};event2=1;eVar4=${product.sku}`;
+          window.AA.track("cart.add", {
+            event2: qty,
+            eVar4: product.sku,
+            eVar8: window.digitalData.cart.id,
+            products: productsString,
+          });
+        }
 
         document.getElementById("cart-count").textContent = window.NLG_cart.cartCount();
         const confirm = document.getElementById("add-confirm");
