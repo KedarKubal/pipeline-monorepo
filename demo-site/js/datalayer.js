@@ -21,19 +21,17 @@
   "use strict";
 
   // ---- 1. Page-load data layer -------------------------------------------------
-  // Populated per-page by each page's inline <script> before this file's
-  // DOMContentLoaded handler runs analytics initialization.
   window.digitalData = window.digitalData || {
     page: {
       pageName: "",
       section: "",
       errorCode: null,
     },
-    product: [], // array of { name, sku, category, price }
+    product: [],
     search: { term: null, resultsCount: null },
     cart: { id: getOrCreateCartId(), items: [] },
     checkout: { stepName: null },
-    order: null, // { orderId, items, total }
+    order: null,
     promo: { code: null },
     user: { visitorType: getVisitorType() },
   };
@@ -48,14 +46,12 @@
   }
 
   function getVisitorType() {
-    // Mirrors eVar14 logic: a Launch rule would check a first-party cookie.
     const seen = localStorage.getItem("nlg_returning_visitor");
     localStorage.setItem("nlg_returning_visitor", "1");
     return seen ? "returning" : "new";
   }
 
   function getMarketingChannel() {
-    // Mirrors eVar13: parsed from utm_source/utm_medium on landing.
     const params = new URLSearchParams(window.location.search);
     const source = params.get("utm_source");
     const medium = params.get("utm_medium");
@@ -65,9 +61,8 @@
 
   // ---- 2. Mock Adobe Analytics / Launch adapter --------------------------------
   const AA = {
-    events: [], // running log for the debug panel
+    events: [],
 
-    /** Fires a "page load" beacon — equivalent to s.t() / a Launch "Library Loaded" rule. */
     pageView: function () {
       const d = window.digitalData;
       const vars = {
@@ -85,12 +80,12 @@
           eVar4: p.sku,
           eVar5: p.category,
         });
-        vars.event1 = 1; // Product View — digitalData.product is only populated on PDP
+        vars.event1 = 1;
       }
       if (d.search.term) {
         vars.eVar6 = d.search.term;
         vars.eVar7 = d.search.resultsCount;
-        vars.event8 = 1; // Internal Search Performed
+        vars.event8 = 1;
       }
       if (d.cart.id) vars.eVar8 = d.cart.id;
       if (d.checkout.stepName) vars.eVar9 = d.checkout.stepName;
@@ -99,7 +94,6 @@
       this._log("s.t() — Page View", vars);
     },
 
-    /** Fires a link-tracking beacon — equivalent to s.tl() / a Launch Direct Call Rule. */
     track: function (eventName, payload) {
       payload = payload || {};
       this._log("_satellite.track('" + eventName + "')", payload);
@@ -114,7 +108,7 @@
       console.log("[AA]", label, vars);
     },
   };
-  window._mockSatellite = AA; // exposed for app.js
+  window._mockSatellite = AA;
 
   // ---- 3. Debug / inspector panel ----------------------------------------------
   function renderDebugPanel() {
@@ -171,7 +165,8 @@
     document.body.appendChild(toggle);
     document.body.appendChild(panel);
   }
-    // ---- 5. Feature flag client (calls the Config Toggle Service) ----------------
+
+  // ---- 5. Feature flag client (calls the Config Toggle Service) ----------------
   // Note: localhost:3000, not the docker-network hostname — this code runs in
   // the browser, which only sees toggle-service's published host port.
   const FLAG_SERVICE_URL = "http://localhost:3000";
@@ -179,9 +174,10 @@
 
   /**
    * Fetches a flag's enabled state from the Config Toggle Service.
-   * Caches per page load (one request per key). Fails OPEN to `false` if
-   * the service is unreachable — a down toggle-service should never block
-   * a user action like adding to cart.
+   * Caches per page load (one request per key). Fails OPEN to `true` if
+   * the service is unreachable — a down toggle-service should never
+   * silently suppress tracking (or block a gated user action) just
+   * because it can't be reached.
    */
   async function fetchFlag(key) {
     if (key in flagCache) return flagCache[key];
@@ -191,14 +187,12 @@
       const data = await res.json();
       flagCache[key] = !!data.enabled;
     } catch (e) {
-      console.warn("[flags] toggle-service unreachable, defaulting to disabled:", e.message);
-      flagCache[key] = false;
+      console.warn("[flags] toggle-service unreachable, defaulting to enabled (fail-open):", e.message);
+      flagCache[key] = true;
     }
     return flagCache[key];
   }
   window.fetchFlag = fetchFlag;
-
-  window.AA = AA;
 
   window.AA = AA;
   document.addEventListener("DOMContentLoaded", function () {

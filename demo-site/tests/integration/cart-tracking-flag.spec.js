@@ -93,23 +93,34 @@ test.describe("cart-tracking-enabled flag gates the cart.add beacon", () => {
     expect(Number(cartCountText)).toBeGreaterThan(0);
   });
 
-  test("fails open (tracking disabled, add-to-cart still works) when toggle-service is unreachable", async ({
-    page,
-  }) => {
-    // Route the flag endpoint to simulate the service being down, rather
-    // than actually stopping the container — keeps the test self-contained.
-    await page.route(`${TOGGLE_SERVICE_URL}/api/flags/${FLAG_KEY}`, (route) => route.abort("connectionrefused"));
+  test("fails open (tracking stays enabled, add-to-cart still works) when toggle-service is unreachable", async ({ page }) => {
+    await setFlagEnabled(page.request, true); // flag itself is irrelevant here — service is unreachable either way
+
+    // Simulate toggle-service being down by aborting requests to it at the
+    // network layer — the same failure fetchFlag() would see from a stopped
+    // container — without needing shell access to actually stop it mid-test.
+    await page.route(`${TOGGLE_SERVICE_URL}/**`, (route) => route.abort("connectionrefused"));
 
     const pdpUrl = await firstProductPdpUrl(page);
     await page.goto(pdpUrl);
 
     await page.getByRole("button", { name: "Add to Cart" }).click();
-    await page.waitForTimeout(500);
+
+    // fetchFlag() must reject, catch, and resolve to fail-open before the
+    // beacon fires — poll rather than a fixed timeout since the exact
+    // rejection timing can vary.
+    await expect
+      .poll(async () => (await getBeaconEvents(page)).some((e) => e.label.includes("cart.add")))
+      .toBe(true);
 
     const events = await getBeaconEvents(page);
-    expect(events.find((e) => e.label.includes("cart.add"))).toBeUndefined();
+    const cartAddBeacon = events.find((e) => e.label.includes("cart.add"));
+    expect(cartAddBeacon).toBeDefined();
+    expect(cartAddBeacon.vars.event2).toBeGreaterThan(0);
 
     const cartCountText = await page.locator("#cart-count").textContent();
     expect(Number(cartCountText)).toBeGreaterThan(0);
+
+    await page.unroute(`${TOGGLE_SERVICE_URL}/**`);
   });
 });
