@@ -12,9 +12,9 @@ Normalization decisions, and why:
 """
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, Numeric, String, UniqueConstraint
+from sqlalchemy import ForeignKey, JSON, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from sqlalchemy.dialects.postgresql import JSONB
 from src.models.base import Base, TimestampMixin
 
 
@@ -82,3 +82,24 @@ class OrderItem(Base, TimestampMixin):
 
     order: Mapped["Order"] = relationship(back_populates="items")
     product: Mapped["Product"] = relationship(back_populates="order_items")
+
+
+class FlagChangeAudit(Base, TimestampMixin):
+    """Audit trail of feature-flag changes, sourced from config-toggle-service's
+    audit log. Not linked by FK to anything else in this schema — flags live
+    in the toggle service, not in this database — so this table has no
+    dependents in the load order (see load/loader.py).
+    """
+    __tablename__ = "flag_change_audits"
+    __table_args__ = (UniqueConstraint("flag_key", "changed_at", name="uq_flag_key_changed_at"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    flag_key: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    action: Mapped[str] = mapped_column(String(32), nullable=False)  # create | update | toggle | delete
+    previous_state: Mapped[dict | None] = mapped_column(
+        JSONB().with_variant(JSON(), "sqlite"), nullable=True
+    )
+    new_state: Mapped[dict | None] = mapped_column(
+        JSONB().with_variant(JSON(), "sqlite"), nullable=True
+    )
+    changed_at: Mapped[str] = mapped_column(String(32), nullable=False)  # ISO timestamp string

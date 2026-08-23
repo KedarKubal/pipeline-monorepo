@@ -89,3 +89,38 @@ def validate_order_lines(df: pd.DataFrame, known_customer_legacy_ids: set[str]) 
 
     stats = quarantined["rejection_reason"].value_counts().to_dict() if len(quarantined) else {}
     return ValidationResult(valid=valid, quarantined=quarantined, stats=stats)
+
+
+
+VALID_AUDIT_ACTIONS = {"create", "update", "toggle", "delete"}
+
+
+def validate_flag_audit(df: pd.DataFrame) -> ValidationResult:
+    """Rejects audit rows with an unrecognized action, missing flag_key, or
+    an unparsable changed_at — the three things that would make this row
+    meaningless or unsafe to upsert as a FlagChangeAudit record.
+    """
+    reasons = pd.Series([None] * len(df), index=df.index, dtype="object")
+
+    missing_key = df["flag_key"].isna() | (df["flag_key"].astype(str).str.strip() == "")
+    reasons[missing_key] = "missing flag_key"
+
+    bad_action = ~df["action"].isin(VALID_AUDIT_ACTIONS) & reasons.isna()
+    reasons[bad_action] = "unrecognized action"
+
+    bad_date = df["changed_at"].isna() & reasons.isna()
+    reasons[bad_date] = "unparsable changed_at"
+
+    is_invalid = reasons.notna()
+    quarantined = df[is_invalid].copy()
+    quarantined["rejection_reason"] = reasons[is_invalid]
+    valid = df[~is_invalid].copy()
+
+    dup_mask = valid.duplicated(subset=["flag_key", "changed_at"], keep="last")
+    newly_quarantined = valid[dup_mask].copy()
+    newly_quarantined["rejection_reason"] = "duplicate (flag_key, changed_at)"
+    quarantined = pd.concat([quarantined, newly_quarantined], ignore_index=True)
+    valid = valid[~dup_mask]
+
+    stats = quarantined["rejection_reason"].value_counts().to_dict() if len(quarantined) else {}
+    return ValidationResult(valid=valid, quarantined=quarantined, stats=stats)

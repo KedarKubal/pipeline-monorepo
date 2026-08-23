@@ -84,3 +84,19 @@ def strip_whitespace(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
 
 def is_valid_email(value: object) -> bool:
     return isinstance(value, str) and bool(_EMAIL_RE.match(value))
+
+
+def coerce_timestamps(df, columns):
+    """Coerces columns to full ISO-8601 timestamp strings (with time-of-day
+    preserved); unparsable values become NaT/NaN.
+
+    Distinct from coerce_dates, which truncates to a date-only string --
+    correct for calendar dates like signup_date/order_date, but wrong for
+    anything used as part of a uniqueness key at sub-day granularity (e.g.
+    flag_change_audits' natural key is (flag_key, changed_at)).
+    """
+    df = df.copy()
+    for col in columns:
+        parsed = pd.to_datetime(df[col], errors="coerce", utc=True)
+        df[col] = parsed.dt.strftime("%Y-%m-%dT%H:%M:%S.%f").str[:-3] + "Z"
+    return df

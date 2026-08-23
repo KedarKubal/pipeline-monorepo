@@ -9,13 +9,13 @@ import pandas as pd
 from src.transform.cleaners import (
     coerce_dates,
     coerce_numeric,
+    coerce_timestamps,
     normalize_email,
     normalize_phone,
     split_full_name,
     strip_whitespace,
 )
-from src.transform.validators import ValidationResult, validate_customers, validate_order_lines
-
+from src.transform.validators import ValidationResult, validate_customers, validate_flag_audit, validate_order_lines
 
 def transform_customers(raw: pd.DataFrame) -> ValidationResult:
     df = raw.copy()
@@ -33,3 +33,10 @@ def transform_order_lines(raw: pd.DataFrame, known_customer_legacy_ids: set[str]
     df = coerce_dates(df, columns=["order_date"])
     df = strip_whitespace(df, columns=["product_sku", "product_name", "status"])
     return validate_order_lines(df, known_customer_legacy_ids=known_customer_legacy_ids)
+
+
+def transform_flag_audit(raw: pd.DataFrame) -> ValidationResult:
+    df = raw.copy()
+    df = coerce_timestamps(df, columns=["changed_at"])
+    df = strip_whitespace(df, columns=["flag_key", "action"])
+    return validate_flag_audit(df)

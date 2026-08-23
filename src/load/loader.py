@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from src.models.target import Address, Customer, Order, OrderItem, Product
+from src.models.target import Address, Customer, FlagChangeAudit, Order, OrderItem, Product
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ class LoadStats:
     products_upserted: int = 0
     orders_upserted: int = 0
     order_items_upserted: int = 0
+    flag_audits_upserted: int = 0
 
 
 class LoadError(RuntimeError):
@@ -208,3 +209,28 @@ class TargetLoader:
                 raise LoadError(f"Failed to load order_item batch: {exc}") from exc
 
         return orders_loaded, items_loaded
+
+    def load_flag_audit(self, session: Session, flag_audit: pd.DataFrame) -> int:
+        """No FK dependency — flags live in the toggle service, not this
+        database — so this can run anywhere in the load sequence, including
+        in parallel with the customer/order chain if that's ever useful.
+        Natural key is (flag_key, changed_at); only the non-key columns are
+        updated on conflict, since a duplicate natural key means this is a
+        re-fetch of the same audit entry, not a new one.
+        """
+        records = flag_audit[["flag_key", "action", "previous_state", "new_state", "changed_at"]].to_dict(
+            "records"
+        )
+        total = 0
+        for batch in _chunk(records, self.batch_size):
+            try:
+                total += _upsert_batch(
+                    session, FlagChangeAudit, batch,
+                    conflict_col=["flag_key", "changed_at"],
+                    update_cols=["action", "previous_state", "new_state"],
+                )
+                session.flush()
+            except Exception as exc:  # noqa: BLE001
+                session.rollback()
+                raise LoadError(f"Failed to load flag_audit batch: {exc}") from exc
+        return total
