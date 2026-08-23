@@ -13,6 +13,18 @@ import pandas as pd
 
 from src.transform.cleaners import is_valid_email
 
+import re
+
+EMAIL_RE_LENIENT = re.compile(r"[^@\s]+@[^@\s]+\.[^@\s]+")
+
+# Rejects consecutive dots, leading/trailing hyphens in domain labels,
+# and other shapes the lenient pattern lets through.
+EMAIL_RE_STRICT = re.compile(
+    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+    r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
+    r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
+)
+
 
 @dataclass
 class ValidationResult:
@@ -27,8 +39,18 @@ class ValidationResult:
             f"({', '.join(f'{k}={v}' for k, v in self.stats.items()) or 'no rejections'})"
         )
 
+def validate_email(value: str, *, strict: bool = False) -> bool:
+    """Validate an email address.
 
-def validate_customers(df: pd.DataFrame) -> ValidationResult:
+    `strict=True` uses the tighter pattern; gated behind the
+    `strict-email-validation` flag so it can roll out gradually without
+    a code deploy, and roll back instantly if it starts quarantining
+    legitimate rows.
+    """
+    pattern = EMAIL_RE_STRICT if strict else EMAIL_RE_LENIENT
+    return bool(pattern.match(value))
+
+def validate_customers(df: pd.DataFrame, *, strict_email: bool = False) -> ValidationResult:
     """Rejects rows with missing legacy_id, missing/invalid email, or missing last_name.
 
     Email is the target schema's uniqueness/business key downstream, so an
@@ -39,7 +61,12 @@ def validate_customers(df: pd.DataFrame) -> ValidationResult:
     missing_id = df["customer_id"].isna() | (df["customer_id"].astype(str).str.strip() == "")
     reasons[missing_id] = "missing customer_id"
 
-    bad_email = ~df["email"].apply(is_valid_email)
+    if strict_email:
+        bad_email = ~df["email"].apply(
+            lambda v: bool(EMAIL_RE_STRICT.match(v)) if isinstance(v, str) else False
+        )
+    else:
+        bad_email = ~df["email"].apply(is_valid_email)
     reasons[bad_email & reasons.isna()] = "missing or invalid email"
 
     missing_name = (df["first_name"].str.strip() == "") & reasons.isna()

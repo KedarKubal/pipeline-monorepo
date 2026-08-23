@@ -15,16 +15,21 @@ from src.transform.cleaners import (
     split_full_name,
     strip_whitespace,
 )
-from src.transform.validators import ValidationResult, validate_customers, validate_flag_audit, validate_order_lines
+from src.transform.validators import (
+    ValidationResult,
+    validate_customers,
+    validate_flag_audit,
+    validate_order_lines,
+)
 
-def transform_customers(raw: pd.DataFrame) -> ValidationResult:
+def transform_customers(raw: pd.DataFrame, *, strict_email: bool = False) -> ValidationResult:
     df = raw.copy()
     df = split_full_name(df, source_col="full_name")
     df = normalize_email(df, col="email")
     df = normalize_phone(df, col="phone")
     df = strip_whitespace(df, columns=["addr_line", "city", "state", "zip"])
     df = coerce_dates(df, columns=["signup_date"])
-    return validate_customers(df)
+    return validate_customers(df, strict_email=strict_email)
 
 
 def transform_order_lines(raw: pd.DataFrame, known_customer_legacy_ids: set[str]) -> ValidationResult:

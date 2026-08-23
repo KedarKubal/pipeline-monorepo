@@ -19,6 +19,14 @@ from src.extract.legacy_db_reader import LegacyOrdersDbExtractor
 from src.load.loader import LoadError, TargetLoader
 from src.transform.pipeline import transform_customers, transform_order_lines
 
+from datetime import datetime, timezone
+from pathlib import Path
+
+from src.flags_client import FlagsClient
+from src.extract.flag_audit_reader import FlagAuditExtractor
+from src.orchestration.state import DEFAULT_STATE_PATH, read_last_success, write_last_success
+from src.transform.pipeline import transform_flag_audit
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("migration")
 
@@ -29,16 +37,27 @@ def cli():
 
 
 @cli.command()
+@click.option(
+    "--toggle-service-url",
+    default="http://localhost:3000",
+    envvar="TOGGLE_SERVICE_URL",
+    help="Base URL of config-toggle-service.",
+)
 @click.option("--customers-csv", required=True, type=click.Path(exists=True), help="Path to legacy customers CSV.")
 @click.option("--legacy-orders-table", default="orders_legacy", help="Legacy DB table name for order lines.")
 @click.option("--dry-run", is_flag=True, help="Run extract+transform and report stats without writing to the target DB.")
-def run(customers_csv: str, legacy_orders_table: str, dry_run: bool):
+def run(customers_csv: str, legacy_orders_table: str, dry_run: bool,toggle_service_url: str,):
     """Run the full extract -> transform -> load pipeline."""
     try:
         settings = get_settings()
     except ConfigError as exc:
         logger.error(str(exc))
         sys.exit(1)
+        
+    flags = FlagsClient(toggle_service_url)
+    strict_email = flags.is_enabled("strict-email-validation", default=False)
+    logger.info("strict-email-validation flag resolved to: %s", strict_email)
+
 
     # --- Extract ---
     logger.info("Extracting customers from %s", customers_csv)
@@ -48,7 +67,7 @@ def run(customers_csv: str, legacy_orders_table: str, dry_run: bool):
     raw_orders = LegacyOrdersDbExtractor(settings.legacy_db_url, table_name=legacy_orders_table).extract()
 
     # --- Transform ---
-    customer_result = transform_customers(raw_customers)
+    customer_result = transform_customers(raw_customers, strict_email=strict_email)
     logger.info("Customer transform: %s", customer_result.summary())
 
     known_ids = set(customer_result.valid["customer_id"].astype(str))
@@ -85,6 +104,80 @@ def run(customers_csv: str, legacy_orders_table: str, dry_run: bool):
         "Load complete: customers=%d addresses=%d products=%d orders=%d order_items=%d",
         n_customers, n_addresses, n_products, n_orders, n_items,
     )
+
+@cli.command("sync-flags-audit")
+@click.option(
+    "--toggle-service-url",
+    default="http://localhost:3000",
+    envvar="TOGGLE_SERVICE_URL",
+    help="Base URL of config-toggle-service.",
+)
+@click.option(
+    "--flags-audit-since",
+    default=None,
+    help="ISO 8601 timestamp. Defaults to the last successful sync recorded in the state file.",
+)
+@click.option(
+    "--state-file",
+    default=str(DEFAULT_STATE_PATH),
+    type=click.Path(),
+    help="Path to the JSON file tracking last-successful-run timestamps.",
+)
+@click.option("--dry-run", is_flag=True, help="Extract+transform and report stats without writing to the target DB.")
+def sync_flags_audit(toggle_service_url: str, flags_audit_since: str | None, state_file: str, dry_run: bool):
+    """Sync the toggle-service flag-change audit log into the target DB.
+
+    Independent of the customers/orders pipeline — flag audit rows have no
+    FK dependency on anything else in the target schema, so this can run
+    on its own schedule (e.g. a more frequent cron than the main migration).
+    """
+    try:
+        settings = get_settings()
+    except ConfigError as exc:
+        logger.error(str(exc))
+        sys.exit(1)
+
+    state_path = Path(state_file)
+    since = flags_audit_since or read_last_success(state_path, key="flags_audit")
+    if since:
+        logger.info("Syncing flag audit entries since %s", since)
+    else:
+        logger.info("No prior sync recorded — fetching full flag audit log")
+
+    # --- Extract ---
+    raw_audit = FlagAuditExtractor(toggle_service_url, since=since).extract()
+
+    # --- Transform ---
+    audit_result = transform_flag_audit(raw_audit)
+    logger.info("Flag audit transform: %s", audit_result.summary())
+    if len(audit_result.quarantined):
+        logger.warning(
+            "Quarantined %d flag audit rows — see logs above for reasons.",
+            len(audit_result.quarantined),
+        )
+
+    if dry_run:
+        logger.info("Dry run complete. No data was written to the target database.")
+        return
+
+    # Record the sync watermark from *fetch time*, not the latest row's
+    # timestamp — avoids ever re-missing an entry that lands between "latest
+    # row we saw" and "when we actually queried."
+    sync_completed_at = datetime.now(timezone.utc).isoformat()
+
+    # --- Load ---
+    engine = create_engine(settings.target_db_url)
+    loader = TargetLoader(engine, batch_size=settings.load_batch_size)
+    try:
+        with Session(engine) as session:
+            n_audit = loader.load_flag_audit(session, audit_result.valid)
+            session.commit()
+    except LoadError as exc:
+        logger.error("Load failed and was rolled back: %s", exc)
+        sys.exit(1)
+
+    write_last_success(state_path, key="flags_audit", timestamp=sync_completed_at)
+    logger.info("Flag audit sync complete: flag_audits=%d (watermark updated to %s)", n_audit, sync_completed_at)
 
 
 if __name__ == "__main__":
