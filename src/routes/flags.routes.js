@@ -9,7 +9,10 @@ const router = Router();
 
 // Reads — public, no auth required.
 router.get('/', controller.list);
+router.get('/audit', controller.getAudit);
 router.get('/:key', controller.getOne);
+router.get('/:key/history', controller.getHistory);
+
 
 // Writes — require a valid X-API-Key header.
 router.post('/', apiKeyAuth, validateFlagPayload({ requireKey: true }), controller.create);

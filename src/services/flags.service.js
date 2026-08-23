@@ -1,11 +1,14 @@
 'use strict';
 
 const fs = require('fs/promises');
+const path = require('path');
 const config = require('../config');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 
 const KEY_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/; // e.g. "new-checkout-flow"
+
+const AUDIT_FILE_PATH = path.join(path.dirname(config.dataFilePath), 'flag_audit.json');
 
 /**
  * Serializes writes to the data file so concurrent requests can't interleave
@@ -37,6 +40,58 @@ async function writeStore(store) {
   // file behind if the process dies mid-write.
   await fs.writeFile(tmpPath, JSON.stringify(store, null, 2), 'utf-8');
   await fs.rename(tmpPath, config.dataFilePath);
+}
+
+async function readAuditStore() {
+  try {
+    const raw = await fs.readFile(AUDIT_FILE_PATH, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw new AppError(`Failed to read audit log: ${err.message}`, 500);
+  }
+}
+
+async function writeAuditStore(entries) {
+  const tmpPath = `${AUDIT_FILE_PATH}.tmp`;
+  await fs.writeFile(tmpPath, JSON.stringify(entries, null, 2), 'utf-8');
+  await fs.rename(tmpPath, AUDIT_FILE_PATH);
+}
+
+/**
+ * Appends one audit entry. NOT wrapped in serialize() itself — every caller
+ * is already running inside a serialize()'d mutation (createFlag, updateFlag,
+ * toggleFlag, deleteFlag), so a nested serialize() call here would deadlock
+ * against the outer queue slot.
+ */
+async function appendAuditEntry({ key, action, previousState, newState, actor = 'unknown' }) {
+  const entries = await readAuditStore();
+  entries.push({
+    key,
+    action, // 'create' | 'update' | 'toggle' | 'delete'
+    previousState: previousState || null,
+    newState: newState || null,
+    actor,
+    timestamp: new Date().toISOString(),
+  });
+  await writeAuditStore(entries);
+}
+
+async function getFlagHistory(key) {
+  const entries = await readAuditStore();
+  return entries.filter((e) => e.key === key);
+}
+
+async function getAuditSince(since) {
+  const entries = await readAuditStore();
+  if (!since) return entries;
+
+  const sinceDate = new Date(since);
+  if (Number.isNaN(sinceDate.getTime())) {
+    throw AppError.badRequest(`Invalid "since" timestamp: "${since}". Expected ISO 8601.`);
+  }
+
+  return entries.filter((e) => new Date(e.timestamp) >= sinceDate);
 }
 
 function validateKey(key) {
@@ -94,6 +149,7 @@ async function createFlag({ key, description, enabled = false, environments, act
 
     store[key] = flag;
     await writeStore(store);
+    await appendAuditEntry({ key, action: 'create', previousState: null, newState: flag, actor });
     logger.info('flag created', { key, actor });
     return flag;
   });
@@ -118,6 +174,7 @@ async function updateFlag(key, updates, actor = 'unknown') {
 
     store[key] = updated;
     await writeStore(store);
+    await appendAuditEntry({ key, action: 'update', previousState: existing, newState: updated, actor });
     logger.info('flag updated', { key, actor, changes: Object.keys(updates) });
     return updated;
   });
@@ -138,6 +195,7 @@ async function toggleFlag(key, actor = 'unknown') {
 
     store[key] = updated;
     await writeStore(store);
+    await appendAuditEntry({ key, action: 'toggle', previousState: existing, newState: updated, actor });
     logger.info('flag toggled', { key, actor, enabled: updated.enabled });
     return updated;
   });
@@ -146,9 +204,11 @@ async function toggleFlag(key, actor = 'unknown') {
 async function deleteFlag(key, actor = 'unknown') {
   return serialize(async () => {
     const store = await readStore();
-    if (!store[key]) throw AppError.notFound(`Flag "${key}" not found.`);
+    const existing = store[key];
+    if (!existing) throw AppError.notFound(`Flag "${key}" not found.`);
     delete store[key];
     await writeStore(store);
+    await appendAuditEntry({ key, action: 'delete', previousState: existing, newState: null, actor });
     logger.info('flag deleted', { key, actor });
   });
 }
@@ -162,4 +222,7 @@ module.exports = {
   deleteFlag,
   validateKey,
   validateEnvironments,
+  appendAuditEntry,
+  getFlagHistory,
+  getAuditSince,
 };

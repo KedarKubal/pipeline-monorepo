@@ -1,0 +1,97 @@
+[
+  {
+    "key": "component-preview-variant",
+    "action": "create",
+    "previousState": null,
+    "newState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": false,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T09:48:49.054Z"
+    },
+    "actor": "api",
+    "timestamp": "2026-08-23T09:48:49.100Z"
+  },
+  {
+    "key": "component-preview-variant",
+    "action": "toggle",
+    "previousState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": false,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T09:48:49.054Z"
+    },
+    "newState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": true,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T09:55:40.584Z"
+    },
+    "actor": "api",
+    "timestamp": "2026-08-23T09:55:40.638Z"
+  },
+  {
+    "key": "component-preview-variant",
+    "action": "toggle",
+    "previousState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": true,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T09:55:40.584Z"
+    },
+    "newState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": false,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T10:57:49.263Z"
+    },
+    "actor": "api",
+    "timestamp": "2026-08-23T10:57:49.274Z"
+  },
+  {
+    "key": "component-preview-variant",
+    "action": "toggle",
+    "previousState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": false,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T10:57:49.263Z"
+    },
+    "newState": {
+      "key": "component-preview-variant",
+      "description": "Widgetbook live variant demo",
+      "enabled": true,
+      "environments": [
+        "development"
+      ],
+      "updatedBy": "api",
+      "updatedAt": "2026-08-23T10:58:12.570Z"
+    },
+    "actor": "api",
+    "timestamp": "2026-08-23T10:58:12.571Z"
+  }
+]

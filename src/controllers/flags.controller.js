@@ -67,4 +67,23 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { list, getOne, create, update, toggle, remove };
+async function getHistory(req, res, next) {
+  try {
+    const history = await flagsService.getFlagHistory(req.params.key);
+    res.json({ key: req.params.key, count: history.length, history });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getAudit(req, res, next) {
+  try {
+    const { since } = req.query;
+    const entries = await flagsService.getAuditSince(since);
+    res.json({ count: entries.length, entries });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { list, getOne, create, update, toggle, remove, getHistory, getAudit };
