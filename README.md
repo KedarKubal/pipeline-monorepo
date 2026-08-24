@@ -21,6 +21,12 @@ It doubles as a **Node.js clean-code reference** — the "cleanup" half of the b
 - ESLint + Prettier enforced, zero warnings
 - Full Jest + Supertest coverage (unit + integration)
 
+It's also the **control plane for the wider `platform-monorepo`** — its audit
+trail is consumed by `migration-platform`'s ETL pipeline, and its flags are
+read at runtime by `migration-platform`'s CLI, the Adobe Analytics demo site,
+and a Flutter Widgetbook catalog. See the [root README](../../README.md) for
+the full cross-project picture.
+
 ---
 
 ## Project Journey
@@ -70,8 +76,13 @@ The heart of the service. Flags are stored as flat JSON with a strict schema:
 | `PATCH /api/flags/:key` | API key | Update description / enabled / environments |
 | `POST /api/flags/:key/toggle` | API key | Flip `enabled` true ↔ false |
 | `DELETE /api/flags/:key` | API key | Remove a flag |
+| `GET /api/flags/:key/history` | none | Full audit history for one flag |
+| `GET /api/flags/audit` | none | All audit entries, optional `?since=<ISO timestamp>` filter |
 
 Reads are public (so dashboards/consumers can poll freely); writes require an `X-API-Key` header.
+
+Note: `GET /api/flags/audit` is registered *before* `GET /api/flags/:key` in
+the router, so the literal string `"audit"` isn't matched as a flag key.
 
 ### Phase 4 — Validation & Auth (`src/middleware/`)
 
@@ -114,6 +125,22 @@ docker compose up --build
 - ESLint (`eslint:recommended` + Prettier integration) — zero warnings on `npm run lint`
 - Prettier for consistent formatting
 - `.env.example` documents every config knob; `.env` is git-ignored
+
+### Phase 9 — Audit Log (`src/services/flags.service.js`, `src/routes/`)
+
+Every create/update/toggle/delete now appends an entry to a new
+`src/data/flag_audit.json` — `{key, action, previousState, newState,
+timestamp}` — reusing the same write-queue + atomic-rename pattern as
+`flags.json`, rather than reinventing persistence for it.
+
+`appendAuditEntry` is intentionally **not** wrapped in its own `serialize()`
+call: every caller is already inside a serialized mutation, and
+double-wrapping would deadlock the write queue.
+
+Two new read endpoints expose it: `GET /api/flags/:key/history` for a single
+flag's history, and `GET /api/flags/audit?since=<ISO timestamp>` for the full
+log — the latter is what `migration-platform`'s `FlagAuditExtractor` polls to
+ingest flag changes as a first-class ETL source.
 
 ---
 
@@ -211,6 +238,24 @@ POST /api/flags/:key/toggle
 DELETE /api/flags/:key
 ```
 
+### Get audit history for a flag
+```
+GET /api/flags/:key/history
+```
+
+### Get all audit entries
+```
+GET /api/flags/audit
+GET /api/flags/audit?since=2026-08-01T00:00:00.000Z
+```
+
+Every create/update/toggle/delete appends an entry to
+`src/data/flag_audit.json` (same write-queue + atomic temp-file-then-rename
+pattern as `flags.json`). This is what `migration-platform`'s
+`FlagAuditExtractor` polls to ingest flag changes as a first-class ETL
+source — see the [root README](../../README.md) for the full cross-project
+picture.
+
 **Flag key format:** lowercase, alphanumeric, hyphen-separated — e.g. `new-checkout-flow`.
 **Supported environments:** `development`, `staging`, `production`.
 
@@ -235,7 +280,9 @@ config-toggle-service/
 │   ├── utils/
 │   │   ├── AppError.js
 │   │   └── logger.js
-│   ├── data/flags.json              # seeded sample flag data
+│   ├── data/
+│   │   ├── flags.json               # seeded sample flag data
+│   │   └── flag_audit.json          # append-only audit log
 │   └── app.js                       # Express app assembly
 │
 ├── public/
@@ -277,7 +324,6 @@ config-toggle-service/
 ## Possible Extensions
 
 - Percentage-based rollouts (`rolloutPercentage` field + consistent hashing on a user ID)
-- Audit log endpoint (`GET /api/flags/:key/history`)
 - Swap file store for Postgres/Redis behind the same service interface
 - Kubernetes manifests (`namespace.yaml`, `deployment.yaml`, `service.yaml`) — straightforward given the existing Dockerfile
 
