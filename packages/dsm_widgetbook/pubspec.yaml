@@ -14,6 +14,7 @@ dependencies:
     path: ../dsm_components
   widgetbook: ^3.10.0
   widgetbook_annotation: ^3.1.0
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:

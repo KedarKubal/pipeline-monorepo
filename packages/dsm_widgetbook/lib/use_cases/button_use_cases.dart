@@ -2,6 +2,8 @@ import 'package:dsm_components/dsm_components.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import 'dsm_button_live_variant_use_case.dart';
+
 /// Use case tree for [DsmButton], registered under Components > Button.
 final List<WidgetbookNode> buttonUseCases = <WidgetbookNode>[
   WidgetbookUseCase(
@@ -76,5 +78,9 @@ final List<WidgetbookNode> buttonUseCases = <WidgetbookNode>[
             .toList(),
       ),
     ),
+  ),
+  WidgetbookUseCase(
+    name: 'Live variant (remote flag)',
+    builder: (BuildContext context) => const DsmButtonLiveVariantUseCase(),
   ),
 ];
