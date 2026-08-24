@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: migration_pass
       POSTGRES_DB: target_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       # seeds a second logical "legacy" DB + legacy table for demo purposes
