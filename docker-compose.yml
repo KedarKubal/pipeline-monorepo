@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: migration_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports: ["5433:5432"]
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  toggle-service:
+    build: ./stages/03-config-toggle-service
+    ports: ["3000:3000"]
+    volumes:
+      - toggle-data:/app/src/data
+
+  adobe-demo-site:
+    build: ./stages/01-adobe-analytics-demo/demo-site
+    ports: ["8000:8000"]
+    volumes:
+      - events-data:/app/data
+
+volumes:
+  pg-data:
+  toggle-data:
+  events-data:

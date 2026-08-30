@@ -1,0 +1,46 @@
+version: '3'
+
+tasks:
+  up:
+    desc: Start all pipeline services
+    cmds: [docker compose up --build]
+
+  test:all:
+    desc: Run every stage's test suite
+    cmds:
+      - task: test:migration
+      - task: test:toggle
+      - task: test:flutter
+
+  test:migration:
+    dir: stages/02-migration-platform
+    cmds: [pytest -v]
+
+  test:toggle:
+    dir: stages/03-config-toggle-service
+    cmds: [npm test]
+
+  test:flutter:
+    dir: stages/04-flutter-dsm
+    cmds: [melos run test]
+
+  pipeline:run:
+    desc: Run the full linear pipeline once, stage by stage
+    cmds:
+      - task: pipeline:extract
+      - task: pipeline:transform
+      - task: pipeline:decide
+
+  pipeline:extract:
+    desc: "Stage 1->2: no-op, events already flow via HTTP as they occur"
+    cmds: ["echo 'Stage 1 events accumulate live in stages/01-adobe-analytics-demo/demo-site/data/events.jsonl'"]
+
+  pipeline:transform:
+    desc: "Stage 2: run the funnel-metrics ETL"
+    dir: stages/02-migration-platform
+    cmds: ["python -m src.orchestration.cli run-funnel-metrics"]
+
+  pipeline:decide:
+    desc: "Stage 3: evaluate metric against threshold, update flag"
+    dir: stages/02-migration-platform
+    cmds: ["python -m src.orchestration.cli sync-alert-flag"]
