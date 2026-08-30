@@ -97,6 +97,7 @@
     track: function (eventName, payload) {
       payload = payload || {};
       this._log("_satellite.track('" + eventName + "')", payload);
+      recordEvent(eventName, payload); // pipeline coupling: persist for migration-platform to extract
     },
 
     _log: function (label, vars) {
@@ -200,3 +201,21 @@
     renderDebugPanel();
   });
 })(window);
+  
+  // ---- 6. Event sink (feeds the migration-platform ETL pipeline) ---------------
+  const EVENTS_ENDPOINT = "/api/events";
+
+  async function recordEvent(eventName, payload) {
+    const event = { event: eventName, timestamp: new Date().toISOString(), ...payload };
+    try {
+      await fetch(EVENTS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(event),
+      });
+    } catch (e) {
+      // Telemetry must never break the shopping flow
+      console.warn("[events-sink] failed to record event:", e.message);
+    }
+  }
+
