@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.9"
+          channel: stable
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap workspace
+        run: dart pub global run melos bootstrap
+
+      - name: Format check
+        run: dart pub global run melos run format
+
+      - name: Analyze
+        run: dart pub global run melos run analyze
+
+      - name: Run tests
+        run: dart pub global run melos run test
+
+      - name: Verify golden tests
+        run: dart pub global run melos run test:golden:verify

@@ -1,0 +1,6 @@
+# melos_managed_dependency_overrides: dsm_components,dsm_tokens
+dependency_overrides:
+  dsm_components:
+    path: ../dsm_components
+  dsm_tokens:
+    path: ../dsm_tokens

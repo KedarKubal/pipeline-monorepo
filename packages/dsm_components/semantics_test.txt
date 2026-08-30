@@ -1,0 +1,57 @@
+00:00 +0: loading /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart
+Warning: A tag was used that wasn't specified in dart_test.yaml.
+  golden was used in:
+    the test "DsmCard golden renders every variant"
+    the test "DsmBadge golden renders every variant x size combination"
+
+00:00 +0: loading /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart
+Warning: A tag was used that wasn't specified in dart_test.yaml.
+  golden was used in:
+    the test "DsmButton golden renders every variant x size combination"
+    the test "DsmButton golden renders disabled and loading states"
+    the test "DsmButton golden renders correctly in dark theme"
+
+00:00 +0: loading /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart
+Warning: A tag was used that wasn't specified in dart_test.yaml.
+  golden was used in the test "DsmTextField golden renders resting, helper, error, and disabled states"
+
+00:00 +0: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton exposes correct semantics label
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: has semantics with label: Delete this item permanently with actions: [tap]  without
+actions: [focus, longPress, scrollLeft, scrollRight, scrollUp, scrollDown, increase, decrease,
+showOnScreen, moveCursorForwardByCharacter, moveCursorBackwardByCharacter, setSelection, copy, cut,
+paste, didGainAccessibilityFocus, didLoseAccessibilityFocus, dismiss, moveCursorForwardByWord,
+moveCursorBackwardByWord, setText]  with flags: isButton,isFocusable  without flags:
+hasCheckedState, isChecked, isCheckStateMixed, isSelected, hasSelectedState, isSlider,
+isKeyboardKey, isLink, isTextField, isReadOnly, isFocused, hasEnabledState, isEnabled,
+isInMutuallyExclusiveGroup, isHeader, isObscured, isMultiline, namesRoute, scopesRoute, isHidden,
+isImage, isLiveRegion, hasToggledState, isToggled, hasImplicitScrolling, hasExpandedState,
+isExpanded, hasRequiredState, isRequired  with validation result: SemanticsValidationResult.none
+  Actual: SemanticsNode:<SemanticsNode#5(Rect.fromLTRB(0.0, 0.0, 800.0, 40.0), flags: [isButton,
+hasEnabledState, isEnabled], label: "Delete this item permanently", textDirection: ltr)>
+   Which: missing actions: [tap] unexpected actions: []
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart:104:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart line 104
+The test description was:
+  exposes correct semantics label
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton exposes correct semantics label [E]
+  Test failed. See exception logs above.
+  The test description was: exposes correct semantics label
+  
+00:01 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton exposes correct semantics label

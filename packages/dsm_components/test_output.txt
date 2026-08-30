@@ -1,0 +1,323 @@
+00:00 +0: loading /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart
+Warning: A tag was used that wasn't specified in dart_test.yaml.
+  golden was used in:
+    the test "DsmCard golden renders every variant"
+    the test "DsmBadge golden renders every variant x size combination"
+
+00:00 +0: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart: DsmCard golden renders every variant
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: one widget whose rasterized image matches golden image "goldens/dsm_card_variants.png"
+  Actual: _FirstWidgetFinder:<Found 1 widget with widget matching predicate (ignoring all but
+first): [
+            View(state: _ViewState#fb7c7),
+          ]>
+   Which: Could not be compared against non-existent file: "goldens/dsm_card_variants.png"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:155:13)
+<asynchronous suspension>
+<asynchronous suspension>
+#8      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#9      compareWithGolden (package:golden_toolkit/src/testing_tools.dart:296:3)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart:31:7)
+<asynchronous suspension>
+#11     testGoldens.<anonymous closure>.body (package:golden_toolkit/src/testing_tools.dart:167:11)
+<asynchronous suspension>
+#12     testGoldens.<anonymous closure> (package:golden_toolkit/src/testing_tools.dart:177:9)
+<asynchronous suspension>
+#13     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#14     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from dart:async and package:stack_trace)
+
+The test description was:
+  renders every variant
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:00 +0 -1: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart: DsmCard golden renders every variant [E]
+  Test failed. See exception logs above.
+  The test description was: renders every variant
+  
+00:00 +0 -1: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart: DsmBadge golden renders every variant x size combination
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: one widget whose rasterized image matches golden image
+"goldens/dsm_badge_variants_sizes.png"
+  Actual: _FirstWidgetFinder:<Found 1 widget with widget matching predicate (ignoring all but
+first): [
+            View(state: _ViewState#fb7c7),
+          ]>
+   Which: Could not be compared against non-existent file: "goldens/dsm_badge_variants_sizes.png"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:155:13)
+<asynchronous suspension>
+<asynchronous suspension>
+#8      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#9      compareWithGolden (package:golden_toolkit/src/testing_tools.dart:296:3)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart:58:7)
+<asynchronous suspension>
+#11     testGoldens.<anonymous closure>.body (package:golden_toolkit/src/testing_tools.dart:167:11)
+<asynchronous suspension>
+#12     testGoldens.<anonymous closure> (package:golden_toolkit/src/testing_tools.dart:177:9)
+<asynchronous suspension>
+#13     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#14     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from dart:async and package:stack_trace)
+
+The test description was:
+  renders every variant x size combination
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -2: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart: DsmBadge golden renders every variant x size combination [E]
+  Test failed. See exception logs above.
+  The test description was: renders every variant x size combination
+  
+00:01 +0 -2: loading /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart
+Warning: A tag was used that wasn't specified in dart_test.yaml.
+  golden was used in:
+    the test "DsmButton golden renders every variant x size combination"
+    the test "DsmButton golden renders disabled and loading states"
+    the test "DsmButton golden renders correctly in dark theme"
+
+00:01 +0 -2: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders every variant x size combination
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: one widget whose rasterized image matches golden image
+"goldens/dsm_button_variants_sizes.png"
+  Actual: _FirstWidgetFinder:<Found 1 widget with widget matching predicate (ignoring all but
+first): [
+            View(state: _ViewState#5c31a),
+          ]>
+   Which: Could not be compared against non-existent file: "goldens/dsm_button_variants_sizes.png"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:155:13)
+<asynchronous suspension>
+<asynchronous suspension>
+#8      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#9      compareWithGolden (package:golden_toolkit/src/testing_tools.dart:296:3)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart:35:7)
+<asynchronous suspension>
+#11     testGoldens.<anonymous closure>.body (package:golden_toolkit/src/testing_tools.dart:167:11)
+<asynchronous suspension>
+#12     testGoldens.<anonymous closure> (package:golden_toolkit/src/testing_tools.dart:177:9)
+<asynchronous suspension>
+#13     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#14     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from dart:async and package:stack_trace)
+
+The test description was:
+  renders every variant x size combination
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:03 +0 -3: loading /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart
+Warning: A tag was used that wasn't specified in dart_test.yaml.
+  golden was used in the test "DsmTextField golden renders resting, helper, error, and disabled states"
+
+00:03 +0 -3: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart: DsmTextField golden renders resting, helper, error, and disabled states
+00:03 +0 -3: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders every variant x size combination [E]
+  Test failed. See exception logs above.
+  The test description was: renders every variant x size combination
+  
+00:03 +0 -3: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders disabled and loading states
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: one widget whose rasterized image matches golden image "goldens/dsm_button_states.png"
+  Actual: _FirstWidgetFinder:<Found 1 widget with widget matching predicate (ignoring all but
+first): [
+            View(state: _ViewState#5c31a),
+          ]>
+   Which: Could not be compared against non-existent file: "goldens/dsm_button_states.png"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:155:13)
+<asynchronous suspension>
+<asynchronous suspension>
+#8      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#9      compareWithGolden (package:golden_toolkit/src/testing_tools.dart:296:3)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart:72:7)
+<asynchronous suspension>
+#11     testGoldens.<anonymous closure>.body (package:golden_toolkit/src/testing_tools.dart:167:11)
+<asynchronous suspension>
+#12     testGoldens.<anonymous closure> (package:golden_toolkit/src/testing_tools.dart:177:9)
+<asynchronous suspension>
+#13     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#14     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from dart:async and package:stack_trace)
+
+The test description was:
+  renders disabled and loading states
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:03 +0 -4: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart: DsmTextField golden renders resting, helper, error, and disabled states
+00:03 +0 -4: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders disabled and loading states [E]
+  Test failed. See exception logs above.
+  The test description was: renders disabled and loading states
+  
+00:03 +0 -4: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders correctly in dark theme
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: one widget whose rasterized image matches golden image "goldens/dsm_button_dark_theme.png"
+  Actual: _FirstWidgetFinder:<Found 1 widget with widget matching predicate (ignoring all but
+first): [
+            View(state: _ViewState#5c31a),
+          ]>
+   Which: Could not be compared against non-existent file: "goldens/dsm_button_dark_theme.png"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:155:13)
+<asynchronous suspension>
+<asynchronous suspension>
+#8      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#9      compareWithGolden (package:golden_toolkit/src/testing_tools.dart:296:3)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart:93:7)
+<asynchronous suspension>
+#11     testGoldens.<anonymous closure>.body (package:golden_toolkit/src/testing_tools.dart:167:11)
+<asynchronous suspension>
+#12     testGoldens.<anonymous closure> (package:golden_toolkit/src/testing_tools.dart:177:9)
+<asynchronous suspension>
+#13     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#14     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from dart:async and package:stack_trace)
+
+The test description was:
+  renders correctly in dark theme
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:03 +0 -5: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart: DsmTextField golden renders resting, helper, error, and disabled states
+00:03 +0 -5: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders correctly in dark theme [E]
+  Test failed. See exception logs above.
+  The test description was: renders correctly in dark theme
+  
+00:04 +0 -5: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart: DsmTextField golden renders resting, helper, error, and disabled states
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: one widget whose rasterized image matches golden image "goldens/dsm_text_field_states.png"
+  Actual: _FirstWidgetFinder:<Found 1 widget with widget matching predicate (ignoring all but
+first): [
+            View(state: _ViewState#8fda4),
+          ]>
+   Which: Could not be compared against non-existent file: "goldens/dsm_text_field_states.png"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:155:13)
+<asynchronous suspension>
+<asynchronous suspension>
+#8      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#9      compareWithGolden (package:golden_toolkit/src/testing_tools.dart:296:3)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart:55:7)
+<asynchronous suspension>
+#11     testGoldens.<anonymous closure>.body (package:golden_toolkit/src/testing_tools.dart:167:11)
+<asynchronous suspension>
+#12     testGoldens.<anonymous closure> (package:golden_toolkit/src/testing_tools.dart:177:9)
+<asynchronous suspension>
+#13     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#14     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 7 frames from dart:async and package:stack_trace)
+
+The test description was:
+  renders resting, helper, error, and disabled states
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:04 +0 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_text_field_golden_test.dart: DsmTextField golden renders resting, helper, error, and disabled states [E]
+  Test failed. See exception logs above.
+  The test description was: renders resting, helper, error, and disabled states
+  
+00:04 +0 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmCard renders its child
+00:05 +1 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmCard is not tappable when onTap is null
+00:05 +2 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmCard invokes onTap when tapped
+00:05 +3 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmCard all variants render without throwing
+00:06 +4 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmBadge renders label text
+00:06 +5 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmBadge renders leading icon when provided
+00:06 +6 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmBadge all variants render without throwing
+00:06 +7 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_card_and_badge_test.dart: DsmBadge all sizes render without throwing
+00:06 +8 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton renders label text
+00:07 +9 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField renders label and placeholder
+00:07 +10 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField renders label and placeholder
+00:08 +11 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField renders label and placeholder
+00:08 +12 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField renders label and placeholder
+00:08 +13 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField renders label and placeholder
+00:08 +13 -6: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton exposes correct semantics label
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: has semantics with label: Delete this item permanently with actions: [tap]  without
+actions: [focus, longPress, scrollLeft, scrollRight, scrollUp, scrollDown, increase, decrease,
+showOnScreen, moveCursorForwardByCharacter, moveCursorBackwardByCharacter, setSelection, copy, cut,
+paste, didGainAccessibilityFocus, didLoseAccessibilityFocus, dismiss, moveCursorForwardByWord,
+moveCursorBackwardByWord, setText]  with flags: isButton,isFocusable  without flags:
+hasCheckedState, isChecked, isCheckStateMixed, isSelected, hasSelectedState, isSlider,
+isKeyboardKey, isLink, isTextField, isReadOnly, isFocused, hasEnabledState, isEnabled,
+isInMutuallyExclusiveGroup, isHeader, isObscured, isMultiline, namesRoute, scopesRoute, isHidden,
+isImage, isLiveRegion, hasToggledState, isToggled, hasImplicitScrolling, hasExpandedState,
+isExpanded, hasRequiredState, isRequired  with validation result: SemanticsValidationResult.none
+  Actual: SemanticsNode:<SemanticsNode#3(Rect.fromLTRB(0.0, 0.0, 800.0, 600.0), flags:
+[scopesRoute])>
+   Which: label was
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart:100:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart line 100
+The test description was:
+  exposes correct semantics label
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:08 +13 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField renders label and placeholder
+00:08 +13 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton exposes correct semantics label [E]
+  Test failed. See exception logs above.
+  The test description was: exposes correct semantics label
+  
+00:08 +14 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_button_test.dart: DsmButton all variants render without throwing
+00:08 +15 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField calls onChanged as the user types
+00:08 +16 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField calls onChanged as the user types
+00:08 +17 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField shows helperText when no error is present
+00:08 +18 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField shows errorText instead of helperText when both are provided
+00:08 +19 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField respects enabled: false by disabling the underlying TextField
+00:08 +20 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField populates controller text and reflects programmatic updates
+00:08 +21 -7: /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/widget/dsm_text_field_test.dart: DsmTextField invokes onTrailingIconTap when the trailing icon is tapped
+00:09 +22 -7: Some tests failed.
+
+Failing tests:
+  /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders correctly in dark theme
+  /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders disabled and loading states
+  /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_button_golden_test.dart: DsmButton golden renders every variant x size combination
+  /home/kedar-kubal/Documents/Projects/flutter_dsm/packages/dsm_components/test/golden/dsm_card_and_badge_golden_test.dart: DsmBadge golden renders every variant x size combination
+  ... and 3 more

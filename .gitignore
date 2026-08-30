@@ -1,0 +1,24 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+.pub-cache/
+.pub/
+pubspec.lock
+
+# Melos
+melos_*.iml
+.melos_tool/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+# Golden test failure diffs (keep the committed golden images, not the diffs)
+**/test/golden/failures/
