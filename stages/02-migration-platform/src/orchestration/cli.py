@@ -18,6 +18,7 @@ from src.extract.csv_reader import CustomerCsvExtractor
 from src.extract.legacy_db_reader import LegacyOrdersDbExtractor
 from src.load.loader import LoadError, TargetLoader
 from src.transform.pipeline import transform_customers, transform_order_lines
+from src.api.metrics_server import serve as serve_metrics_api
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -319,6 +320,15 @@ def sync_alert_flag(toggle_service_url: str, metric_name: str):
         sys.exit(1)
 
     logger.info("high-cart-abandonment-alert set to %s", should_alert)
+
+@cli.command("serve-metrics-api")
+@click.option("--port", default=8001, help="Port to serve the read-only metrics API on.")
+def serve_metrics_api_command(port: int):
+    """Pipeline Stage 2 -> Stage 4: serves the latest funnel metric over
+    HTTP so the Widgetbook insights dashboard can poll it, the same way
+    it already polls flags from config-toggle-service.
+    """
+    serve_metrics_api(port=port)
 
 
 if __name__ == "__main__":
