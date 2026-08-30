@@ -25,8 +25,10 @@ const server = http.createServer((req, res) => {
     req.on("data", (chunk) => (body += chunk));
     req.on("end", () => {
       try {
-        JSON.parse(body); // validate before writing
-        fs.appendFile(EVENTS_FILE, body + "\n", (err) => {
+        const parsed = JSON.parse(body); // validate before writing
+        if (!parsed.timestamp) parsed.timestamp = new Date().toISOString();
+        const line = JSON.stringify(parsed) + "\n";        
+	fs.appendFile(EVENTS_FILE, line, (err) => {
           if (err) {
             console.error("[events] write failed:", err);
             res.writeHead(500).end(JSON.stringify({ error: "write_failed" }));
