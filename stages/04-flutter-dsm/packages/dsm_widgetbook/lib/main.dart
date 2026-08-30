@@ -1,10 +1,10 @@
 import 'package:dsm_components/dsm_components.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
-
 import 'use_cases/badge_use_cases.dart';
 import 'use_cases/button_use_cases.dart';
 import 'use_cases/card_use_cases.dart';
+import 'use_cases/insights_use_cases.dart';
 import 'use_cases/text_field_use_cases.dart';
 
 void main() {
@@ -60,6 +60,10 @@ class DsmWidgetbookApp extends StatelessWidget {
             WidgetbookFolder(name: 'Card', children: cardUseCases),
             WidgetbookFolder(name: 'Badge', children: badgeUseCases),
           ],
+        ),
+        WidgetbookFolder(
+          name: 'Pipeline Insights',
+          children: insightsUseCases,
         ),
       ],
     );
