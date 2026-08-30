@@ -23,6 +23,8 @@ class Settings:
     target_db_url: str
     legacy_db_url: str
     load_batch_size: int
+    toggle_service_api_key: str = ""
+    cart_abandonment_alert_threshold: float = 0.7
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -41,10 +43,21 @@ class Settings:
         if batch_size <= 0:
             raise ConfigError("LOAD_BATCH_SIZE must be a positive integer.")
 
+        toggle_service_api_key = os.getenv("TOGGLE_SERVICE_API_KEY", "")
+        threshold_raw = os.getenv("CART_ABANDONMENT_ALERT_THRESHOLD", "0.7")
+        try:
+            cart_abandonment_alert_threshold = float(threshold_raw)
+        except ValueError as exc:
+            raise ConfigError(
+                f"CART_ABANDONMENT_ALERT_THRESHOLD must be a number, got {threshold_raw!r}"
+            ) from exc
+
         return cls(
             target_db_url=target_db_url,
             legacy_db_url=legacy_db_url,
             load_batch_size=batch_size,
+            toggle_service_api_key=toggle_service_api_key,
+            cart_abandonment_alert_threshold=cart_abandonment_alert_threshold,
         )
 
 

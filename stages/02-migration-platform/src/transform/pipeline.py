@@ -20,6 +20,7 @@ from src.transform.validators import (
     validate_customers,
     validate_flag_audit,
     validate_order_lines,
+    validate_analytics_events
 )
 
 def transform_customers(raw: pd.DataFrame, *, strict_email: bool = False) -> ValidationResult:
@@ -45,3 +46,10 @@ def transform_flag_audit(raw: pd.DataFrame) -> ValidationResult:
     df = coerce_timestamps(df, columns=["changed_at"])
     df = strip_whitespace(df, columns=["flag_key", "action"])
     return validate_flag_audit(df)
+
+
+def transform_analytics_events(raw: pd.DataFrame) -> ValidationResult:
+    df = raw.copy()
+    df = coerce_timestamps(df, columns=["timestamp"])
+    df = strip_whitespace(df, columns=["event"])
+    return validate_analytics_events(df)

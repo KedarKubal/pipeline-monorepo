@@ -61,3 +61,42 @@ class FlagsClient:
 
         self._cache[key] = enabled
         return enabled
+    
+    def set_enabled(self, key: str, *, enabled: bool, api_key: str, description: str = "") -> None:
+        """Sets a flag's enabled state, creating it first if it doesn't exist.
+
+        Unlike is_enabled(), this does NOT fail open — a flag write is a
+        decision this pipeline is making (e.g. "raise the cart-abandonment
+        alert"), and there's no safe default for "did that decision get
+        recorded or not." Raises RuntimeError on any failure so the caller
+        (the CLI) can surface it loudly rather than silently no-op.
+        """
+        headers = {"X-API-Key": api_key}
+        patch_url = f"{self._base_url}/api/flags/{key}"
+
+        try:
+            response = httpx.patch(patch_url, json={"enabled": enabled}, headers=headers, timeout=self._timeout)
+            if response.status_code == 404:
+                # Flag doesn't exist yet — create it, already in the desired state.
+                create_response = httpx.post(
+                    f"{self._base_url}/api/flags",
+                    json={
+                        "key": key,
+                        "description": description or f"Auto-managed by migration-platform pipeline.",
+                        "enabled": enabled,
+                        "environments": ["development", "staging", "production"],
+                    },
+                    headers=headers,
+                    timeout=self._timeout,
+                )
+                create_response.raise_for_status()
+            else:
+                response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise RuntimeError(
+                f"Failed to set flag {key!r} to enabled={enabled}: HTTP {exc.response.status_code} — {exc.response.text}"
+            ) from exc
+        except httpx.RequestError as exc:
+            raise RuntimeError(f"Failed to set flag {key!r} to enabled={enabled}: {exc}") from exc
+
+        self._cache[key] = enabled

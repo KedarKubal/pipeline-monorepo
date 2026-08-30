@@ -103,3 +103,24 @@ class FlagChangeAudit(Base, TimestampMixin):
         JSONB().with_variant(JSON(), "sqlite"), nullable=True
     )
     changed_at: Mapped[str] = mapped_column(String(32), nullable=False)  # ISO timestamp string
+
+
+class FunnelMetric(Base, TimestampMixin):
+    """A computed pipeline insight (e.g. cart_abandonment_rate), sourced
+    from adobe-analytics-demo events via migration-platform's ETL. No FK
+    dependency on anything else — a time-series metric table, natural key
+    is (metric_name, window_start, window_end) so re-running the same
+    window is an idempotent upsert, not a duplicate row.
+    """
+    __tablename__ = "funnel_metrics"
+    __table_args__ = (
+        UniqueConstraint("metric_name", "window_start", "window_end", name="uq_metric_window"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    metric_name: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    metric_value: Mapped[float] = mapped_column(Numeric(10, 4), nullable=False)
+    sample_size: Mapped[int] = mapped_column(nullable=False, default=0)
+    window_start: Mapped[str] = mapped_column(String(32), nullable=False)
+    window_end: Mapped[str] = mapped_column(String(32), nullable=False)
+    computed_at: Mapped[str] = mapped_column(String(32), nullable=False)

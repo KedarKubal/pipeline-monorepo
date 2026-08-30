@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: migration_postgres
+    container_name: pipeline_migration_postgres
     environment:
       POSTGRES_USER: migration_user
       POSTGRES_PASSWORD: migration_pass

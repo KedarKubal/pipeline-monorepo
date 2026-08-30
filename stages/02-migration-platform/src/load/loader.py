@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from src.models.target import Address, Customer, FlagChangeAudit, Order, OrderItem, Product
+from src.models.target import Address, Customer, FlagChangeAudit, Order, OrderItem, Product, FunnelMetric
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class LoadStats:
     orders_upserted: int = 0
     order_items_upserted: int = 0
     flag_audits_upserted: int = 0
-
+    funnel_metrics_upserted: int = 0
 
 class LoadError(RuntimeError):
     """Raised when a batch fails to commit; caller decides whether to retry/abort."""
@@ -233,4 +233,26 @@ class TargetLoader:
             except Exception as exc:  # noqa: BLE001
                 session.rollback()
                 raise LoadError(f"Failed to load flag_audit batch: {exc}") from exc
+        return total
+
+    def load_funnel_metrics(self, session: Session, metrics: pd.DataFrame) -> int:
+        """Natural key (metric_name, window_start, window_end) — re-running
+        the same window is an idempotent upsert, matching load_flag_audit's
+        pattern for the audit table.
+        """
+        records = metrics[
+            ["metric_name", "metric_value", "sample_size", "window_start", "window_end", "computed_at"]
+        ].to_dict("records")
+        total = 0
+        for batch in _chunk(records, self.batch_size):
+            try:
+                total += _upsert_batch(
+                    session, FunnelMetric, batch,
+                    conflict_col=["metric_name", "window_start", "window_end"],
+                    update_cols=["metric_value", "sample_size", "computed_at"],
+                )
+                session.flush()
+            except Exception as exc:  # noqa: BLE001
+                session.rollback()
+                raise LoadError(f"Failed to load funnel_metrics batch: {exc}") from exc
         return total

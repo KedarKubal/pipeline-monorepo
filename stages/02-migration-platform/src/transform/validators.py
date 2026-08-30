@@ -151,3 +151,29 @@ def validate_flag_audit(df: pd.DataFrame) -> ValidationResult:
 
     stats = quarantined["rejection_reason"].value_counts().to_dict() if len(quarantined) else {}
     return ValidationResult(valid=valid, quarantined=quarantined, stats=stats)
+
+
+def validate_analytics_events(df: pd.DataFrame) -> ValidationResult:
+    """Rejects rows missing an event name or with an unparsable timestamp.
+
+    Deliberately does NOT restrict which event names are allowed — the
+    demo-site emits whatever _satellite.track() calls exist at each call
+    site, and this pipeline shouldn't need a code change every time a new
+    event type is added upstream. Downstream aggregation picks the event
+    names it cares about.
+    """
+    reasons = pd.Series([None] * len(df), index=df.index, dtype="object")
+
+    missing_event = df["event"].isna() | (df["event"].astype(str).str.strip() == "")
+    reasons[missing_event] = "missing event name"
+
+    bad_timestamp = df["timestamp"].isna() & reasons.isna()
+    reasons[bad_timestamp] = "unparsable timestamp"
+
+    is_invalid = reasons.notna()
+    quarantined = df[is_invalid].copy()
+    quarantined["rejection_reason"] = reasons[is_invalid]
+    valid = df[~is_invalid].copy()
+
+    stats = quarantined["rejection_reason"].value_counts().to_dict() if len(quarantined) else {}
+    return ValidationResult(valid=valid, quarantined=quarantined, stats=stats)
