@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Config Toggle Dashboard</title>
+<style>
+  :root {
+    --bg: #0f1115; --card: #171a21; --border: #262b36; --text: #e6e9ef;
+    --muted: #8b93a7; --accent: #4f8cff; --on: #34c759; --off: #4b5261; --danger: #ff5c5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); padding: 32px 16px;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .key-input {
+    width: 100%; padding: 8px 10px; margin-bottom: 20px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .flag-name { font-weight: 600; font-size: 14px; }
+  .flag-desc { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .flag-envs { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; inset: 0; background: var(--off);
+    border-radius: 999px; transition: .15s;
+  }
+  .slider::before {
+    content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+    background: white; border-radius: 50%; transition: .15s;
+  }
+  input:checked + .slider { background: var(--on); }
+  input:checked + .slider::before { transform: translateX(20px); }
+  .status { font-size: 12px; color: var(--muted); margin-top: 16px; min-height: 16px; }
+  .error { color: var(--danger); }
+  .empty { color: var(--muted); font-size: 13px; padding: 20px 0; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ Config Toggle Dashboard</h1>
+    <div class="subtitle">Live view of feature flags served by config-toggle-service</div>
+    <input class="key-input" id="apiKey" type="password" placeholder="X-API-Key (required to toggle flags)" />
+    <div id="flags"></div>
+    <div class="status" id="status"></div>
+  </div>
+
+<script>
+  const flagsEl = document.getElementById('flags');
+  const statusEl = document.getElementById('status');
+  const apiKeyInput = document.getElementById('apiKey');
+
+  function setStatus(msg, isError = false) {
+    statusEl.textContent = msg;
+    statusEl.className = 'status' + (isError ? ' error' : '');
+  }
+
+  async function fetchFlags() {
+    try {
+      const res = await fetch('/api/flags');
+      const data = await res.json();
+      renderFlags(data.flags || []);
+      setStatus(`Loaded ${data.count} flag(s).`);
+    } catch (err) {
+      setStatus('Failed to load flags: ' + err.message, true);
+    }
+  }
+
+  function renderFlags(flags) {
+    flagsEl.innerHTML = '';
+    if (flags.length === 0) {
+      flagsEl.innerHTML = '<div class="empty">No flags yet. Create one via the API.</div>';
+      return;
+    }
+    flags.forEach((flag) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div>
+          <div class="flag-name">${flag.key}</div>
+          <div class="flag-desc">${flag.description || ''}</div>
+          <div class="flag-envs">Environments: ${flag.environments.join(', ')}</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" ${flag.enabled ? 'checked' : ''} data-key="${flag.key}" />
+          <span class="slider"></span>
+        </label>
+      `;
+      flagsEl.appendChild(card);
+    });
+
+    document.querySelectorAll('.switch input').forEach((input) => {
+      input.addEventListener('change', (e) => toggleFlag(e.target.dataset.key, e.target));
+    });
+  }
+
+  async function toggleFlag(key, checkboxEl) {
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+      setStatus('Enter an API key above to toggle flags.', true);
+      checkboxEl.checked = !checkboxEl.checked; // revert visual toggle
+      return;
+    }
+    try {
+      const res = await fetch(`/api/flags/${key}/toggle`, {
+        method: 'POST',
+        headers: { 'X-API-Key': apiKey },
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error?.message || 'Request failed');
+      }
+      const updated = await res.json();
+      setStatus(`"${key}" is now ${updated.enabled ? 'ON' : 'OFF'}.`);
+    } catch (err) {
+      setStatus('Toggle failed: ' + err.message, true);
+      checkboxEl.checked = !checkboxEl.checked;
+    }
+  }
+
+  fetchFlags();
+</script>
+</body>
+</html>
